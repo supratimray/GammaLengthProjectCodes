@@ -1,4 +1,4 @@
-function [lengthList,freqList,timeList,meanE,timeVals,freqVals] = getBurstLengthMP(analogData,timeVals,thresholdFactor,displayFlag,stimulusPeriodS,baselinePeriodS,burstFreqRangeHz,maxIteration,adaptiveDictionaryParam,dictionarySize)
+function [lengthList,freqList,timeList,gaborInfo,header] = getBurstLengthMP(analogData,timeVals,thresholdFactor,displayFlag,stimulusPeriodS,baselinePeriodS,burstFreqRangeHz,maxIteration,adaptiveDictionaryParam,dictionarySize,gaborInfo,header)
 
 if ~exist('displayFlag','var');         displayFlag=1;                  end
 if ~exist('stimulusPeriodS','var');     stimulusPeriodS=[0.5 1.5];      end
@@ -7,11 +7,16 @@ if ~exist('burstFreqRangeHz','var');    burstFreqRangeHz=[40 60];       end
 if ~exist('maxIteration','var');        maxIteration=50;                end
 if ~exist('adaptiveDictionaryParam','var');adaptiveDictionaryParam=0.9; end
 if ~exist('dictionarySize','var');      dictionarySize=[];              end
+if ~exist('gaborInfo','var');           gaborInfo=[];                   end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Get MP Data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Fs=round(1/(timeVals(2)-timeVals(1)));
-[B,A]=butter(4,[burstFreqRangeHz(1)-10 burstFreqRangeHz(2)+10]/(Fs/2));
-analogData1=filtfilt(B,A,analogData')';
-[gaborInfo,header,timeVals] = getStochasticDictionaryMP3p1(analogData1,timeVals,maxIteration,adaptiveDictionaryParam,dictionarySize);
+
+if isempty(gaborInfo)
+    [B,A]=butter(4,[burstFreqRangeHz(1)-10 burstFreqRangeHz(2)+10]/(Fs/2));
+    analogData1=filtfilt(B,A,analogData')';
+    [gaborInfo,header] = getStochasticDictionaryMP3p1(analogData1,timeVals,maxIteration,adaptiveDictionaryParam,dictionarySize);
+end
 numTrials = size(gaborInfo,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Threshold Computation %%%%%%%%%%%%%%%%%%%%%%%%%

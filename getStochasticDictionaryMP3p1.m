@@ -1,7 +1,7 @@
 % This program uses MP version 3.1 by Piotr Durka's group. This is the
 % original stochastic dictionary code used in their 2001 paper.
 
-function [gaborInfo,header,timeVals] = getStochasticDictionaryMP3p1(data,timeVals,maxIteration,adaptiveDictionaryParam,dictionarySize)
+function [gaborInfo,header] = getStochasticDictionaryMP3p1(data,timeVals,maxIteration,adaptiveDictionaryParam,dictionarySize)
 
 if ~exist('maxIteration','var');           maxIteration=50;             end
 if ~exist('adaptiveDictionaryParam','var');adaptiveDictionaryParam=0.9; end
@@ -29,7 +29,7 @@ for i=1:numTrials
     % Write Command File
     fp=fopen('commands.txt','w');
     if ~isempty(dictionarySize)
-        fprintf(fp,['reinit -R ' num2str(dictionarySize)]);
+        fprintf(fp,['reinit -R ' num2str(dictionarySize) ' \n']);
     end
     fprintf(fp,['set -O ' num2str(sigLen) ' -M ' num2str(maxIteration) ' -E ' num2str(recAc) ' -F ' num2str(Fs) ' -D ' num2str(adaptiveDictionaryParam) ' \n']);
     fprintf(fp,'loadasc -O sig.txt\n');
