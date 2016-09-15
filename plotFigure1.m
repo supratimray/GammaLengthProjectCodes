@@ -2,7 +2,7 @@ function plotFigure1
 
 subjectName = 'alpa'; expDate = '120316'; protocolName = 'GRF_001';
 gridType = 'Microelectrode'; folderSourceString = '';
-electrodeNum=83;cVal=100;trialNum=1;
+electrodeNum=83;cVal=100;trialNum=2;
 
 folderName = fullfile(folderSourceString,'data',subjectName,gridType,expDate,protocolName,'segmentedData','LFP');
 st = load(fullfile(folderName,['elec' num2str(electrodeNum) 'c' num2str(cVal) '.mat']));
@@ -10,7 +10,7 @@ t  = load(fullfile(folderName,'lfpInfo.mat'));
 timeVals = t.timeVals;
 
 fRange = [0 100];
-stimulusPeriod = [0.5 1.5];
+stimulusPeriod = [0.5 2];
 
 % CGT
 fRes=2; sd=0.025; 
@@ -70,7 +70,7 @@ plotDataStats(subplot(3,4,12),sqrt(p),trialNum);
 end
 function plotDataStats(plotHandle,powerVals,trialNum)
 
-nBins = 50;
+nBins = 100;
 xLim = [0 5];
 binStep = diff(xLim)/nBins;
 histCenterVals = binStep:binStep:xLim(2);
