@@ -1,4 +1,4 @@
-function [burstLengthCGT,burstLengthFeingold,burstLengthMP]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz)
+function [burstLengthCGT,burstLengthFeingold,burstLengthMP,diffPower]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz)
 
 gridType = 'Microelectrode'; 
 folderSourceString = '';
