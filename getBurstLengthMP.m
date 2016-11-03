@@ -1,4 +1,4 @@
-function [lengthList,freqList,timeList,gaborInfo,header] = getBurstLengthMP(analogData,timeVals,thresholdFactor,displayFlag,stimulusPeriodS,baselinePeriodS,burstFreqRangeHz,maxIteration,adaptiveDictionaryParam,dictionarySize,gaborInfo,header)
+function [lengthList,freqList,timeList,gaborInfo,header,modList] = getBurstLengthMP(analogData,timeVals,thresholdFactor,displayFlag,stimulusPeriodS,baselinePeriodS,burstFreqRangeHz,maxIteration,adaptiveDictionaryParam,dictionarySize,gaborInfo,header)
 
 if ~exist('displayFlag','var');         displayFlag=1;                  end
 if ~exist('stimulusPeriodS','var');     stimulusPeriodS=[0.5 1.5];      end
@@ -34,6 +34,7 @@ MODULUS=4; %mp2tf uses modulus, although gabor uses amplitude
 lengthList = cell(1,numTrials);
 freqList = cell(1,numTrials);
 timeList = cell(1,numTrials);
+modList = cell(1,numTrials);
 
 octaveToLengthMultiplier = 4/sqrt(2*pi);
 for i=1:numTrials
@@ -53,6 +54,7 @@ for i=1:numTrials
         lengthList{i} = octaveToLengthMultiplier*o(useThesePos);
         freqList{i} = f(useThesePos);
         timeList{i} = t(useThesePos);
+        modList{i} = m(useThesePos);
     end
 end
 
