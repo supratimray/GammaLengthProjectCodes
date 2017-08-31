@@ -20,23 +20,36 @@ cgtGaborSDList = [12.5 25]/1000;
 numCGTSDList = length(cgtGaborSDList);
 displayFlagCGT=0;
 
+% Wavelet
+displayFlagWavelet=0;
+
 % Feingold et al., 2015
 filterOrderFeingold=4;
 displayFlagFeingold=0;
+
+% Hilbert
+filterOrderHilbert=4;
+displayFlagHilbert=0;
 
 % MP
 maxIteration=50; %#ok<*NASGU>
 adaptiveDictionaryParam=0.9;
 dictionarySize=2500000;
 displayFlagMP=0;
-showMPResults=1;
+showMPResults=0;
 
 % Initialize
 medianBurstLengthCGT = zeros(numBurstLengths,numCGTSDList,numThresholds);
 seBurstLengthCGT = zeros(numBurstLengths,numCGTSDList,numThresholds);
 
+medianBurstLengthWavelet = zeros(numBurstLengths,numThresholds);
+seBurstLengthWavelet = zeros(numBurstLengths,numThresholds);
+
 medianBurstLengthFeingold = zeros(numBurstLengths,numThresholds);
 seBurstLengthFeingold = zeros(numBurstLengths,numThresholds);
+
+medianBurstLengthHilbert = zeros(numBurstLengths,numThresholds);
+seBurstLengthHilbert = zeros(numBurstLengths,numThresholds);
 
 medianBurstLengthMP = zeros(numBurstLengths,numThresholds);
 seBurstLengthMP = zeros(numBurstLengths,numThresholds);
@@ -58,9 +71,17 @@ for i=1:numBurstLengths
             [medianBurstLengthCGT(i,j,ii),seBurstLengthCGT(i,j,ii)] = getMedianAndSE(burstLengthCGT);
         end
         
+         % Estimate burst length using Wavelet
+        burstLengthWavelet = getBurstLengthWavelet(analogData,timeVals,thresholdFactor,displayFlagWavelet,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz);
+        [medianBurstLengthWavelet(i,ii),seBurstLengthWavelet(i,ii)] = getMedianAndSE(burstLengthWavelet);
+        
         % Estimate burst length using Feingold et al., 2015
         burstLengthFeingold = getBurstLengthFeingold(analogData,timeVals,thresholdFactor,displayFlagFeingold,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,filterOrderFeingold);
         [medianBurstLengthFeingold(i,ii),seBurstLengthFeingold(i,ii)] = getMedianAndSE(burstLengthFeingold);
+        
+        % Estimate burst length using Hilbert method
+        burstLengthHilbert = getBurstLengthHilbert(analogData,timeVals,thresholdFactor,displayFlagHilbert,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,filterOrderHilbert);
+        [medianBurstLengthHilbert(i,ii),seBurstLengthHilbert(i,ii)] = getMedianAndSE(burstLengthHilbert);
         
         % Estimate burst length using Stochastic MP
         if showMPResults
@@ -74,7 +95,7 @@ for i=1:numBurstLengths
     end
 end
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 XingDataX = [0.025 0.05 0.075 0.1 0.125];
 XingDataY = [0.115 0.122 0.14 0.155 0.165];
 
@@ -82,18 +103,22 @@ for ii=1:numThresholds
     figure(ii);
     plot(XingDataX,XingDataY,'ks','linewidth',2); hold on;
     
-    colorNames = jet(numCGTSDList+3);
+    colorNames = jet(numCGTSDList+4);
     for i=1:numCGTSDList
         errorbar(burstLenList,squeeze(medianBurstLengthCGT(:,i,ii)),squeeze(seBurstLengthCGT(:,i,ii)),'color',colorNames(i,:));
     end
     
-    errorbar(burstLenList,medianBurstLengthFeingold(:,ii),seBurstLengthFeingold(:,ii),'color',colorNames(numCGTSDList+1,:));
+    errorbar(burstLenList,medianBurstLengthWavelet(:,ii),seBurstLengthWavelet(:,ii),'color',colorNames(numCGTSDList+1,:));
+    
+    errorbar(burstLenList,medianBurstLengthFeingold(:,ii),seBurstLengthFeingold(:,ii),'color',colorNames(numCGTSDList+2,:));
+    
+    errorbar(burstLenList,medianBurstLengthHilbert(:,ii),seBurstLengthHilbert(:,ii),'color',colorNames(numCGTSDList+3,:));
     
     if showMPResults
-        errorbar(burstLenList,medianBurstLengthMP(:,ii),seBurstLengthMP(:,ii),'color',colorNames(numCGTSDList+3,:));
+        errorbar(burstLenList,medianBurstLengthMP(:,ii),seBurstLengthMP(:,ii),'color',colorNames(numCGTSDList+4,:));
     end
     
-    %
+    
     xs=0:0.1:1;
     plot(xs,xs,'k');
     axis([0 1 0 1]);
