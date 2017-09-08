@@ -1,4 +1,4 @@
-function [burstLengthCGT,burstLengthFeingold,burstLengthMP,diffPower,freqListCGT,freqListMP,modListMP]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz,runMPAnalysisFlag)
+function [burstLengthCGT,burstLengthFeingold,burstLengthMP,burstLengthWT,burstLengthHilbert,diffPower,freqListCGT,freqListMP,freqListWT,modListMP]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz,runMPAnalysisFlag)
 
 if ~exist('runMPAnalysisFlag','var');   runMPAnalysisFlag=1;            end
 
@@ -7,9 +7,9 @@ folderSourceString = '';
 stimulusPeriodS=[0.5 2];
 baselinePeriodS=[-1.5 0];
 
-% CGT and Feingold
+% CGT and Feingold and Hilbert
 cgtGaborSD = 25/1000;
-filterOrderFeingold=4;
+filterOrder=4;
 
 % MP
 maxIteration=50;
@@ -27,9 +27,11 @@ timeVals = t.timeVals;
 diffPower = getChangeInPower(analogData,timeVals,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz);
 thresholdFactor = diffPower*thresholdFraction;
 
-% Get Burst lengths CGT and Feingold
+% Get Burst lengths using CGT, Wavelet, Feingold and Hilbert
 [burstLengthCGT,freqListCGT] = getBurstLengthCGT(analogData,timeVals,thresholdFactor,0,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,cgtGaborSD);
-burstLengthFeingold = getBurstLengthFeingold(analogData,timeVals,thresholdFactor,0,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,filterOrderFeingold);  
+[burstLengthWT,freqListWT] = getBurstLengthWavelet(analogData,timeVals,thresholdFactor,0,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz);
+burstLengthFeingold = getBurstLengthFeingold(analogData,timeVals,thresholdFactor,0,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,filterOrder);  
+burstLengthHilbert = getBurstLengthHilbert(analogData,timeVals,thresholdFactor,0,stimulusPeriodS,baselinePeriodS,gammaFreqRangeHz,filterOrder);
 
 if runMPAnalysisFlag
     % Save MP results

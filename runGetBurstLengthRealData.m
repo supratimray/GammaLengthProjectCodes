@@ -16,15 +16,15 @@ diffPower=zeros(1,numElectrodes);
 
 methodNames{1} = 'MP'; 
 methodNames{2} = 'CGT';
-methodNames{3} = 'Feingold';
+methodNames{3} = 'Wavelet'; 
+methodNames{4} = 'Feingold';
+methodNames{5} = 'Hilbert'; 
 
 runMPAnalysisFlag=1;
 
 numMethods = length(methodNames);
-colorNames{1} = 'k';
-colorNames{2} = [0.5 0.5 0.5];
-colorNames{3} = [0.8 0.8 0.8];
-symbols = 'o+X';
+colorNames = 'rckgb';
+symbols = 'Xo*+v';
 
 allBurstLengthsAllElectrodes = cell(1,numMethods);
 allBurstFreqsAllElectrodes = cell(1,numMethods-1);
@@ -40,7 +40,7 @@ for i=1:numElectrodes
     electrodeNum=electrodeList(i);
     disp(i);
     clear burstLengths freqLists
-    [burstLengths{2},burstLengths{3},burstLengths{1},diffPower(i),freqLists{2},freqLists{1},modListMP]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz,runMPAnalysisFlag);
+    [burstLengths{2},burstLengths{4},burstLengths{1},burstLengths{3},burstLengths{5},diffPower(i),freqLists{2},freqLists{1},freqLists{3},modListMP]=getBurstLengthRealData(subjectName,expDate,protocolName,electrodeNum,thresholdFraction,cVal,gammaFreqRangeHz,runMPAnalysisFlag);
     
     allBurstLengthsSingleElectrodes=cell(1,numMethods);
     allBurstFreqsSingleElectrode=cell(1,numMethods);
@@ -56,14 +56,14 @@ for i=1:numElectrodes
     for ii=1:numMethods
         for iii=1:numTrials
             allBurstLengthsSingleElectrodes{ii}=cat(1,allBurstLengthsSingleElectrodes{ii},burstLengths{ii}{iii}(:));
-            if ii<numMethods
+            if ii<(numMethods-1)
                 allBurstFreqsSingleElectrode{ii}=cat(1,allBurstFreqsSingleElectrode{ii},freqLists{ii}{iii}(:));
             end
         end
         allBurstLengthsAllElectrodes{ii}=cat(1,allBurstLengthsAllElectrodes{ii},allBurstLengthsSingleElectrodes{ii});
         badIndices = find(allBurstLengthsSingleElectrodes{ii}>lengthLimit);
 
-        if ii<numMethods
+        if ii<(numMethods-1)
             allBurstFreqsAllElectrodes{ii}=cat(1,allBurstFreqsAllElectrodes{ii},allBurstFreqsSingleElectrode{ii});
         end
         burstLengthsTMP = allBurstLengthsSingleElectrodes{ii};
@@ -76,18 +76,18 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 histC = 0.025:0.025:2;
 for i=1:numMethods
-    subplot(2,3,plotLocation(1));
-    plot(diffPower,medianBurstLength(i,:),'color',colorNames{i},'marker',symbols(i),'linestyle','none'); hold on;
+    subplot(1,3,plotLocation(1));
+    plot(diffPower,medianBurstLength(i,:),'color',colorNames(i),'marker',symbols(i),'linestyle','none'); hold on;
     axis([0 40 0 0.5]);
 
     x=allBurstLengthsAllElectrodes{i};
     badIndices = find(x>lengthLimit);
     
-    subplot(2,3,plotLocation(2));
+    subplot(1,3,plotLocation(2));
     x2=x; x2(badIndices)=[];
     histVals = hist(x2,histC);
     nHistVals = histVals/sum(histVals);
-    plot(histC,nHistVals,'color',colorNames{i}); 
+    plot(histC,nHistVals,'color',colorNames(i)); 
     hold on;
     axis([0 2 0 0.2]);
     
@@ -97,7 +97,7 @@ for i=1:numMethods
     disp(['diffPower & BurstLength: Corr=' num2str(r) ',p=' num2str(p)]);
 
     if i==1
-        subplot(2,3,plotLocation(3));
+        subplot(1,3,plotLocation(3));
         f=allBurstFreqsAllElectrodes{i};
         f2=f; f2(badIndices)=[];
         numUniqueFreqs=unique(f2);
@@ -114,7 +114,7 @@ for i=1:numMethods
                 seLength(j)=0;
             end
         end
-        errorbar(numUniqueFreqs,medianLength,seLength,'color',colorNames{i});
+        errorbar(numUniqueFreqs,medianLength,seLength,'color',colorNames(i));
         axis([39 61 0 1.25]);
 %         y2=allModsMP;
 %         y2(badIndices)=[];
@@ -123,14 +123,15 @@ for i=1:numMethods
     end
 end
 
-subplot(2,3,4);
+subplot(1,3,1);
 xlabel('Change in power (dB)');
 ylabel('Burst duration (s)');
 
-subplot(2,3,5);
+subplot(1,3,2);
 xlabel('Burst duration (s)');
 ylabel('Fraction of bursts');
+legend(methodNames{1},methodNames{2},methodNames{3},methodNames{4},methodNames{5})
 
-subplot(2,3,6);
+subplot(1,3,3);
 xlabel('Burst center frequency (Hz)');
 ylabel('Burst duration (s)');
