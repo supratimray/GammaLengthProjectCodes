@@ -4,6 +4,7 @@ if ~exist('displayFlag','var');         displayFlag=1;                  end
 if ~exist('stimulusPeriodS','var');     stimulusPeriodS=[0.5 1.5];      end
 if ~exist('baselinePeriodS','var');     baselinePeriodS=[-1 0];         end
 if ~exist('burstFreqRangeHz','var');    burstFreqRangeHz=[40 60];       end
+if ~exist('filterOrder','var');         filterOrder=4;                  end
 
 numTrials=size(analogData,1);
 

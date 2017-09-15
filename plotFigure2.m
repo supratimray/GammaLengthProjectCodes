@@ -46,21 +46,9 @@ tPosB=intersect(find(timeVals>=timePeriodB(1)),find(timeVals<timePeriodB(2)));
 [psdS,freqValsS]=mtspectrumc(st.analogData(:,tPosS)',params);
 [psdB,freqValsB]=mtspectrumc(st.analogData(:,tPosB)',params);
 
-subplot(231);
+subplot(131);
 plot(freqValsB,log10(mean(psdB,2)),'color','m'); hold on;
 plot(freqValsS,log10(mean(psdS,2)),'color','r');
-
-subplot(234);
-plot(freqValsB,std(psdB,[],2)./mean(psdB,2),'color','m'); hold on;
-plot(freqValsS,std(psdS,[],2)./mean(psdS,2),'color','r');
-
-ampB=sqrt(psdB); ampS=sqrt(psdS);
-plot(freqValsB,std(ampB,[],2)./mean(ampB,2),'color','m'); hold on;
-plot(freqValsS,std(ampS,[],2)./mean(ampS,2),'color','r');
-
-plot(freqValsB,1+zeros(1,length(freqValsB)),'k');
-plot(freqValsB,0.53+zeros(1,length(freqValsB)),'k');
-ylim([0 2]);
 
 %%%%%%%%%%%%%%%%%%%%%% Compute Power Vs Time %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i=1:numTrials
