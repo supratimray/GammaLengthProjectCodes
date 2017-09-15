@@ -13,18 +13,20 @@ t  = load(fullfile(folderName,'lfpInfo.mat'));
 timeVals = t.timeVals;
 dt=timeVals(2)-timeVals(1);
 
-fRange = [0 100];
+fRange = [0 100];    
 timePeriodS=[0.5 1.5];
 timePeriodB=[-1 0];
 
 colorNames{1} = 'b'; % CGT
 colorNames{2} = 'g'; % BPF
 colorNames{3} = 'm'; % Multi-taper
+colorNames{4} = 'k'; % WT
+colorNames{5} = 'r'; % HT
 
-% CGT
+% CGT & WT
 fRes=1; sd=0.025; 
 
-% Feingold
+% Feingold & Hilbert
 bandHalfWidthHz = 10;
 filtOrder=4;
 bandCenterFreqHz=[11 20:10:100];
@@ -65,10 +67,19 @@ for i=1:numTrials
     % CGT
     [cgt,freqValsCGT]=getCGT(st.analogData(i,:),timeVals,fRange,fRes,sd);
     powerCGT(i,:,:)=abs(cgt).^2; %#ok<*AGROW>
+    
+    %WT
+    [cw1,freqValsWT]=getWavelet(st.analogData(i,:),timeVals,[fRange(1)+0.1 fRange(2)],fRes); % Wavelet function wont work with 0 frequency
+    powerWT(i,:,:)=abs(cw1).^2;
 
     % BPF (Feingold)
     for j=1:length(bandCenterFreqHz)
         powerBPF(i,j,:)=getBPFPowerFeingold(st.analogData(i,:),timeVals,[bandCenterFreqHz(j)-bandHalfWidthHz bandCenterFreqHz(j)+bandHalfWidthHz],filtOrder);
+    end
+    
+     % BPF (Hilbert)
+    for j=1:length(bandCenterFreqHz)
+        powerHT(i,j,:)=getHilbertPower(st.analogData(i,:),timeVals,[bandCenterFreqHz(j)-bandHalfWidthHz bandCenterFreqHz(j)+bandHalfWidthHz],filtOrder);
     end
 end
 
@@ -78,6 +89,8 @@ end
 x{1}=powerCGT; tList{1}=timeVals; fList{1}=freqValsCGT;
 x{2}=powerBPF; tList{2}=timeVals; fList{2}=bandCenterFreqHz;
 x{3}=permute(powerMT,[3 2 1]); tList{3}=timeValsMT;fList{3}=freqValsMT;
+x{4}=powerWT; tList{4}=timeVals; fList{4}=freqValsWT;
+x{5}=powerHT; tList{5}=timeVals; fList{5}=bandCenterFreqHz;
 
 for i=1:length(x)
     subplot(132)
